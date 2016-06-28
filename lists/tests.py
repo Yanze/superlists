@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.core.urlresolvers import resolve
 from django.http import HttpRequest
+from django.template.loader import render_to_string
 
 from lists.views import home_page
 
@@ -19,7 +20,12 @@ class HomePageTest(TestCase):
         # then we insert .content of the response, which is the HTML that we send to the user.
         response = home_page(request)
 
-        # response.content is raw bytes, not a python string, so use b'' syntax to compare them.
-        self.assertTrue(response.content.startswith(b'<html>'))
-        self.assertIn(b'<title>To-Do lists</title>', response.content)
-        self.assertTrue(response.content.endswith(b'</html>'))
+        # testing if we're rendering the right template
+        expected_html = render_to_string('home.html')
+        
+        """
+        use decode() to convert the response.content bytes into a
+        python unicode string, which allows us to compare strings with strings
+
+        """
+        self.assertEqual(response.content.decode(), expected_html)
